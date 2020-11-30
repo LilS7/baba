@@ -46,6 +46,34 @@ def clean_data(data):
              7: '1/trimestre', 8: 'Less', 9: 'Never'}
     data.loc[:, 'Frequency'] = data['Frequency'].map(drows)
     return data
+import sys
+import urllib.parse
+import requests
+
+BASE_URI = "https://www.metaweather.com"
+
+
+def search_city(query):
+    city_url = f"{BASE_URI}/api/location/search/?query={query}"
+    response = requests.get(city_url).json()
+    print(f"Here is the weather in {response[0]['title']}")
+    return response[0]
+
+
+def weather_forecast(woeid):
+    weather_url = f"{BASE_URI}/api/location/{woeid}/"
+    response = requests.get(weather_url).json()
+    for i, forecast in enumerate(response['consolidated_weather']):
+        if i <= 4:
+            print(f"{forecast['applicable_date']}: {forecast['weather_state_name']} {forecast['the_temp']}°C")
+        else:
+            break
+
+def main():
+    query = input("City?\n> ")
+    woeid = search_city(query)['woeid']
+    weather_forecast(woeid)
+
 
 
 if __name__ == '__main__':
